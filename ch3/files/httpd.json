@@ -1,0 +1,16 @@
+{
+    "service": {
+      "name": "httpd",
+      "tags": [
+        "python-server"
+      ],
+      "port": 8080,
+      "check": {
+        "args": [
+          "curl",
+          "localhost:8080"
+        ],
+        "interval": "10s"
+      }
+    }
+  }
