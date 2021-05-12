@@ -17,6 +17,12 @@ data "aws_ami" "an_image" {
     values = ["${var.owner}-consul-*"]
   }
 }
+locals {
+  common_tags = {
+    Owner = "Rob Jackson"
+    }
+}
+
 resource "tls_private_key" "my_private_key" {
  algorithm = "RSA"
  rsa_bits = 4096
