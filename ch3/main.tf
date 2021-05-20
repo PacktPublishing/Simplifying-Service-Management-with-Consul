@@ -1,14 +1,3 @@
-locals {
-  # Common tags to be assigned to all resources
-  common_tags = {
-    owner   = var.owner
-    se-region = "AMER - Northeast E1"
-    purposse = "education"
-    ttl = "7 days"
-    terraform = "true"
-    hc-internet-facing = "true"
-  }
-}
 terraform {
   required_providers {
     aws = {
@@ -25,7 +14,7 @@ data "aws_ami" "an_image" {
   owners           = ["self"]
   filter {
     name   = "name"
-    values = ["${var.owner}-consul-*"]
+    values = ["${var.owner}-secure-consul-*"]
   }
 }
 resource "tls_private_key" "my_private_key" {
@@ -54,11 +43,6 @@ resource aws_subnet "consul-demo" {
   tags = {
     name = "${var.owner}-subnet"
     owner   = var.owner
-    se-region = "AMER - Northeast E1"
-    purpose = "education"
-    ttl = "7 days"
-    terraform = "true"
-    hc-internet-facing = "true"
   }
 }
 resource aws_internet_gateway "consul-demo" {
@@ -67,11 +51,6 @@ resource aws_internet_gateway "consul-demo" {
   tags = {
     Name = "${var.owner}-internet-gateway"
     owner   = var.owner
-    se-region = "AMER - Northeast E1"
-    purpose = "education"
-    ttl = "7 days"
-    terraform = "true"
-    hc-internet-facing = "true"
   }
 }
 resource aws_route_table "consul-demo" {
@@ -140,11 +119,6 @@ resource aws_security_group "consul-demo" {
   tags = {
     Name = "${var.owner}-security-group"
     owner   = var.owner
-    se-region = "AMER - Northeast E1"
-    purpose = "education"
-    ttl = "7 days"
-    terraform = "true"
-    hc-internet-facing = "true"
   }
 }
 resource aws_instance "consul-server" {
@@ -152,7 +126,6 @@ resource aws_instance "consul-server" {
   ami                         = data.aws_ami.an_image.id
   instance_type               = var.instance_type
   key_name                    = aws_key_pair.consul_key.key_name
-  // key_name                    = "rjackson-east"
   associate_public_ip_address = true
   subnet_id                   = aws_subnet.consul-demo.id
   vpc_security_group_ids      = [aws_security_group.consul-demo.id]
@@ -162,11 +135,6 @@ resource aws_instance "consul-server" {
     Name  = "${var.owner}-consul-server-instance"
     Instance = "${var.owner}-consul-server-instance-${count.index}"
     owner   = var.owner
-    se-region = "AMER - Northeast E1"
-    purpose = "education"
-    ttl = "7 days"
-    terraform = "true"
-    hc-internet-facing = "true"
   }
   provisioner "file" {
     source      = "files/dc1-server-consul-${count.index}.pem"
@@ -204,11 +172,6 @@ resource aws_instance "consul-client" {
   tags = {
     Name  = "${var.owner}-consul-client-instance-${count.index}"
     owner   = var.owner
-    se-region = "AMER - Northeast E1"
-    purpose = "education"
-    ttl = "7 days"
-    terraform = "true"
-    hc-internet-facing = "true"
   }
 }
 resource null_resource "provisioning-clients" {
@@ -253,7 +216,6 @@ resource null_resource "provisioning-clients" {
     type        = "ssh"
     user        = "ubuntu"
     private_key = local_file.private_key.content
-    // private_key = file("~/hashicorp/aws/rjackson-east2.pem")
     host        = each.value.public_ip
   }
 }

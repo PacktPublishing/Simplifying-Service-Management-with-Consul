@@ -1,6 +1,7 @@
 {
     "service": {
       "name": "httpd",
+      "id":"httpd-1",
       "tags": [
         "python-server"
       ],

@@ -1,0 +1,20 @@
+{
+  "service": {
+    "name": "httpd",
+    "id":"httpd-1",
+    "tags": [
+      "python-server"
+    ],
+    "port": 8080,
+    "connect": {
+      "sidecar_service": {}
+    },
+    "check": {
+      "args": [
+        "curl",
+        "localhost:8080"
+      ],
+      "interval": "10s"
+    }
+  }
+}
