@@ -30,5 +30,5 @@ override.tf.json
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
 *.txt
-ch2/.terraform.lock.hcl
-ch3/rjackson-consul-key2.pem
+*/.terraform.lock.hcl
+*/*-consul-key.pem

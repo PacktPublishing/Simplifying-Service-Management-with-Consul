@@ -1,9 +1,9 @@
 source "amazon-ebs" "ubuntu-image" {
-  ami_name = "${var.owner}-packt-consul-ch8-{{timestamp}}"
+  ami_name = "${var.owner}-secure-consul-{{timestamp}}"
   region = "${var.aws_region}"
   instance_type = var.aws_instance_type
   tags = {
-    Name = "${var.owner}-packt-consul-ch8"
+    Name = "${var.owner}-secure-consul"
   }
   source_ami_filter {
       filters = {
@@ -52,12 +52,10 @@ build {
       "echo \"copying ca file\"",
       "sudo cp /tmp/consul-agent-ca.pem /etc/consul/consul.d/consul-agent-ca.pem",
       "echo \"ca file copied\"",
-      "curl -k -O \"https://releases.hashicorp.com/consul-terraform-sync/0.1.2/consul-terraform-sync_0.1.2_linux_amd64.zip\"",
-      "unzip consul-terraform-sync_0.1.2_linux_amd64.zip",
-      "sudo mv consul-terraform-sync /usr/local/bin",
-      "curl -k -O \"https://releases.hashicorp.com/consul-template/0.25.2/consul-template_0.25.2_linux_amd64.zip\"",
-      "unzip consul-template_0.25.2_linux_amd64.zip",
-      "sudo mv consul-template /usr/local/bin"
+      "curl -L https://getenvoy.io/cli | sudo bash -s -- -b /usr/local/bin",
+      "getenvoy run standard:1.13.6 -- --version",
+      "sudo cp ~/.getenvoy/builds/standard/1.13.6/linux_glibc/bin/envoy /usr/local/bin/",
+      "envoy --version"
     ]
   }
 }

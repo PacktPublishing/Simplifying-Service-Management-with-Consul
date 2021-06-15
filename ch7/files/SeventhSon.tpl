@@ -1,0 +1,1 @@
+Seventh Son of a Seventh Son is a story about a young boy born with the gift of {{ key "/son/seventh/gift" }}. It has been popularized in literary form by Orson Scott Card, and musically by Iron Maiden through their epic album of the same title.

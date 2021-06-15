@@ -7,6 +7,6 @@ output "Consul_Client_IPs" {
 output "CONSUL_HTTP_ADDR" {
   value ="http://${aws_instance.consul-server[1].public_ip}:8500"
 }
-output "CTS_IP" {
-  value = aws_instance.cts-client.public_ip
+output "CONSUL_HTTPS_ADDR" {
+  value ="https://${aws_instance.consul-server[1].public_ip}:8501"
 }

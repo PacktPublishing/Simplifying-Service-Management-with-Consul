@@ -14,7 +14,7 @@ data "aws_ami" "an_image" {
   owners           = ["self"]
   filter {
     name   = "name"
-    values = ["${var.owner}-packt-consul-ch8*"]
+    values = ["${var.owner}-secure-consul-*"]
   }
 }
 resource "tls_private_key" "my_private_key" {
@@ -136,23 +136,23 @@ resource aws_instance "consul-server" {
     Instance = "${var.owner}-consul-server-instance-${count.index}"
     owner   = var.owner
   }
-  // provisioner "file" {
-  //   source      = "files/dc1-server-consul-${count.index}.pem"
-  //   destination = "/tmp/dc1-server-consul-${count.index}.pem"
-  // }
-  // provisioner "file" {
-  //   source      = "files/dc1-server-consul-${count.index}-key.pem"
-  //   destination = "/tmp/dc1-server-consul-${count.index}-key.pem"
-  // }
-  // provisioner "file" {
-  //   source      = "files/server_acl.hcl"
-  //   destination = "/tmp/server_acl.hcl"
-  // }
-  // provisioner "remote-exec" {
-  //   inline = [
-  //     "sudo mv /tmp/*.pem /etc/consul/consul.d/"
-  //    ]
-  // }
+  provisioner "file" {
+    source      = "files/dc1-server-consul-${count.index}.pem"
+    destination = "/tmp/dc1-server-consul-${count.index}.pem"
+  }
+  provisioner "file" {
+    source      = "files/dc1-server-consul-${count.index}-key.pem"
+    destination = "/tmp/dc1-server-consul-${count.index}-key.pem"
+  }
+  provisioner "file" {
+    source      = "files/server_acl.hcl"
+    destination = "/tmp/server_acl.hcl"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "sudo mv /tmp/*.pem /etc/consul/consul.d/"
+    ]
+  }
   connection {
     type        = "ssh"
     user        = "ubuntu"
@@ -161,7 +161,7 @@ resource aws_instance "consul-server" {
   }
 }
 resource aws_instance "consul-client" {
-  count                       = 4
+  count                       = 2
   ami                         = data.aws_ami.an_image.id
   instance_type               = var.instance_type
   key_name                    = aws_key_pair.consul_key.key_name
@@ -173,13 +173,9 @@ resource aws_instance "consul-client" {
     source      = "files/httpd.json"
     destination = "/tmp/httpd.json"
   }
-  // provisioner "file" {
-  //   source      = "files/client_acl.hcl"
-  //   destination = "/tmp/client_acl.hcl"
-  // }
   provisioner "file" {
-    source      = "files/SeventhSon.tpl"
-    destination = "/tmp/SeventhSon.tpl"
+    source      = "files/client_acl.hcl"
+    destination = "/tmp/client_acl.hcl"
   }
   provisioner "remote-exec" {
     inline = [
@@ -190,11 +186,17 @@ resource aws_instance "consul-client" {
       "bind_addr = \"${self.private_ip}\"",
       "retry_join = [\"${aws_instance.consul-server[0].public_ip}\",\"${aws_instance.consul-server[1].public_ip}\",\"${aws_instance.consul-server[2].public_ip}\"]",
       "client_addr = \"${self.private_ip}\"",
+      "ca_file =\"/etc/consul/consul.d/consul-agent-ca.pem\"",
+      "verify_incoming = true",
+      "verify_outgoing = true",
+      "verify_server_hostname = true",
+      "auto_encrypt = {",
+      "  tls = true",
+      "}",
       "EOF",
       "sudo mv /tmp/consul-client.hcl /etc/consul/consul.d/consul-client.hcl",
       "sudo mv /tmp/httpd.json /etc/consul/consul.d/httpd.json",
       "nohup python3 -m http.server 8080 --bind 127.0.0.1 &",
-      "nohup sudo consul-template -consul-addr=\"http://${self.private_ip}:8500\" -template \"/tmp/SeventhSon.tpl:/etc/consul/seventh_son.txt\" &",
       "sleep 60"
     ]
   }
@@ -211,61 +213,6 @@ resource aws_instance "consul-client" {
   }
   tags = {
     Name  = "${var.owner}-consul-client-instance-${count.index}"
-    owner   = var.owner
-  }
-}
-resource aws_instance "cts-client" {
-  ami                         = data.aws_ami.an_image.id
-  instance_type               = var.instance_type
-  key_name                    = aws_key_pair.consul_key.key_name
-  associate_public_ip_address = true
-  subnet_id                   = aws_subnet.consul-demo.id
-  vpc_security_group_ids      = [aws_security_group.consul-demo.id]
-  iam_instance_profile        = aws_iam_instance_profile.instance_profile.name
-  user_data = templatefile("files/cts-config.tpl", {})
-
-  // provisioner "file" {
-  //   source      = "files/httpd.json"
-  //   destination = "/tmp/httpd.json"
-  // }
-  // provisioner "file" {
-  //   source      = "files/client_acl.hcl"
-  //   destination = "/tmp/client_acl.hcl"
-  // }
-  // provisioner "file" {
-  //   source      = "files/SeventhSon.tpl"
-  //   destination = "/tmp/SeventhSon.tpl"
-  // }
-  provisioner "remote-exec" {
-    inline = [
-      "sudo cat << EOF > /tmp/consul-client.hcl",
-      "advertise_addr = \"${self.public_ip}\"",
-      "server = false",
-      "enable_local_script_checks = true",
-      "bind_addr = \"${self.private_ip}\"",
-      "retry_join = [\"${aws_instance.consul-server[0].public_ip}\",\"${aws_instance.consul-server[1].public_ip}\",\"${aws_instance.consul-server[2].public_ip}\"]",
-      "client_addr = \"${self.private_ip}\"",
-      "EOF",
-      "sudo mv /tmp/consul-client.hcl /etc/consul/consul.d/consul-client.hcl"
-  //     "sudo mv /tmp/httpd.json /etc/consul/consul.d/httpd.json",
-  //     "nohup python3 -m http.server 8080 --bind 127.0.0.1 &",
-  //     "nohup sudo consul-template -consul-addr=\"http://${self.private_ip}:8500\" -template \"/tmp/SeventhSon.tpl:/etc/consul/seventh_son.txt\" &",
-  //     "sleep 60"
-    ]
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "sudo systemctl start consul",
-    ]
-  }
-  connection {
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = local_file.private_key.content
-    host        = self.public_ip
-  }
-  tags = {
-    Name  = "${var.owner}-cts-client"
     owner   = var.owner
   }
 }

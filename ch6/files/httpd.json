@@ -5,6 +5,10 @@
     "tags": [
       "python-server"
     ],
+    "port": 8080,
+    "connect": {
+      "sidecar_service": {}
+    },
     "check": {
       "args": [
         "curl",
