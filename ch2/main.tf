@@ -40,7 +40,9 @@ resource aws_vpc "consul-demo" {
 resource aws_subnet "consul-demo" {
   vpc_id     = aws_vpc.consul-demo.id
   cidr_block = var.vpc_cidr
-  tags = local.common_tags
+  tags = {
+    Name  = "${var.owner}-subnet"
+  }
 }
 resource aws_internet_gateway "consul-demo" {
   vpc_id = aws_vpc.consul-demo.id
