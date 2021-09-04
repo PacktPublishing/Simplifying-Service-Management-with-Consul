@@ -37,8 +37,7 @@ build {
     inline = [
       "sleep 30",
       "sudo apt-get update",
-      "sudo apt install unzip -y",
-      "sudo apt install default-jre -y",
+      "sudo apt install unzip default-jre apt-transport-https gnupg2 curl lsb-release -y",
       "curl -k -O \"https://releases.hashicorp.com/consul/${var.consul_version}/consul_${var.consul_version}_linux_amd64.zip\"",
       "unzip consul_${var.consul_version}_linux_amd64.zip",
       "sudo mv consul /usr/local/bin",
@@ -52,10 +51,10 @@ build {
       "echo \"copying ca file\"",
       "sudo cp /tmp/consul-agent-ca.pem /etc/consul/consul.d/consul-agent-ca.pem",
       "echo \"ca file copied\"",
-      "curl -L https://getenvoy.io/cli | sudo bash -s -- -b /usr/local/bin",
-      "getenvoy run standard:1.13.6 -- --version",
-      "sudo cp ~/.getenvoy/builds/standard/1.13.6/linux_glibc/bin/envoy /usr/local/bin/",
-      "envoy --version"
+      "curl -sL 'https://deb.dl.getenvoy.io/public/gpg.8115BA8E629CC074.key' | sudo gpg --dearmor -o /usr/share/keyrings/getenvoy-keyring.gpg",
+      "echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/getenvoy-keyring.gpg] https://deb.dl.getenvoy.io/public/deb/ubuntu $(lsb_release -cs) main\" | sudo tee /etc/apt/sources.list.d/getenvoy.list",
+      "sudo apt update",
+      "sudo apt install -y getenvoy-envoy"
     ]
   }
 }
