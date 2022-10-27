@@ -58,3 +58,7 @@ We also provide a PDF file that has color images of the screenshots/diagrams use
 ## Get to Know the Author
 **Robert E. Jackson**
 He earned his bachelor of science in electrical engineering from Purdue University in 1997, and since then has found himself in a multitude of pre- and post-sales positions with various successful start-ups, mostly in the network access technology space. He has played multiple roles over the course of his career, including sales engineer, solutions engineer, integration engineer, network engineer, and product manager. Throughout all of these engineering positions he never learned to drive a train, but he was able to experience the digital transformation from traditional data centers to cloud computing from multiple viewpoints. He is currently employed at HashiCorp as a senior solutions engineer, based in the northeast area of the United States.
+### Download a free PDF
+
+ <i>If you have already purchased a print or Kindle version of this book, you can get a DRM-free PDF version at no cost.<br>Simply click on the link to claim your free PDF.</i>
+<p align="center"> <a href="https://packt.link/free-ebook/9781800202627">https://packt.link/free-ebook/9781800202627 </a> </p>
